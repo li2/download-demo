@@ -175,7 +175,6 @@ public class DownloadTask extends AsyncTask<Void, Integer, Long> {
             downloadSize = progress[0];
             downloadPercent = (downloadSize + previousFileSize) * 100 / totalSize;
             networkSpeed = downloadSize / totalTime;
-            Log.d(TAG, "percent " + downloadPercent);
             if (listener != null)
                 listener.updateProcess(this);
         }

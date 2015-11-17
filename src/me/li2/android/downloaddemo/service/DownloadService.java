@@ -51,7 +51,7 @@ public class DownloadService extends Service {
                 updateIntent.putExtra(MyIntents.TYPE, MyIntents.Types.PROCESS);
                 updateIntent.putExtra(MyIntents.PROCESS_SPEED, task.getDownloadSpeed() + "kbps | "
                         + task.getDownloadSize() + " / " + task.getTotalSize());
-                updateIntent.putExtra(MyIntents.PROCESS_PROGRESS, task.getDownloadPercent() + "");
+                updateIntent.putExtra(MyIntents.PROCESS_PROGRESS, task.getDownloadPercent());
                 updateIntent.putExtra(MyIntents.URL, task.getUrl());
                 sendBroadcast(updateIntent);
             }

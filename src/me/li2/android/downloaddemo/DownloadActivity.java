@@ -17,39 +17,42 @@ import android.view.View.OnClickListener;
 import android.widget.Button;
 import android.widget.ProgressBar;
 import android.widget.TextView;
+import android.widget.Toast;
 import me.li2.android.downloaddemo.service.DownloadService;
 import me.li2.android.downloaddemo.service.DownloadService.DownloadBinder;
 
 public class DownloadActivity extends FragmentActivity {
-    private static final String TAG = "Download";
-    private static final String URL1 ="http://www.soundhelix.com/examples/mp3/SoundHelix-Song-1.mp3";
-    private static final String URL2 = "http://img.yingyonghui.com/apk/16457/com.rovio.angrybirdsspace.ads.1332528395706.apk";
+    private static final String TAG = "DownloadActivity";
+    private static final String URL ="http://www.soundhelix.com/examples/mp3/SoundHelix-Song-1.mp3";
     
     private DownloadService mService;
     boolean mBound = false;
     
     private ProgressBar mLoadingProgressBar;
     private TextView mLoadingProgressTv;
+    private Button mDownloadBtn;
     
     @Override
     protected void onCreate(Bundle arg0) {
         super.onCreate(arg0);
+        Log.d(TAG, "onCreate() called");
+        Toast.makeText(this, "onCreate() called", Toast.LENGTH_SHORT).show();
         setContentView(R.layout.activity_download);
         mLoadingProgressBar = (ProgressBar) findViewById(R.id.loadignProgressBar);
         mLoadingProgressTv = (TextView) findViewById(R.id.loadingProgressTv);
         
-        final String url = URL2;
-        Button downloadBtn = (Button) findViewById(R.id.downloadBtn);
-        downloadBtn.setOnClickListener(new OnClickListener() {
+        mDownloadBtn = (Button) findViewById(R.id.downloadBtn);
+        mDownloadBtn.setOnClickListener(new OnClickListener() {
             @Override
             public void onClick(View v) {
                 if (mBound) {
-                    mService.startDownloadTask(url);
+                    mDownloadBtn.setEnabled(false);
+                    mService.startDownloadTask(URL);
                 }
             }
         });
         
-        int progress = 22;
+        int progress = 0;
         mLoadingProgressBar.setProgress(progress);
         mLoadingProgressTv.setText("" + progress + "%");
     }
@@ -78,10 +81,19 @@ public class DownloadActivity extends FragmentActivity {
         unregisterReceiver(mDownloadingStatusReceiver);
     }
     
+    @Override
+    protected void onDestroy() {
+        super.onDestroy();
+        Toast.makeText(this, "onDestroy() called", Toast.LENGTH_SHORT).show();        
+        Log.d(TAG, "onDestroy() called");
+    }
+    
     private ServiceConnection mConnection = new ServiceConnection() {
         
         @Override
         public void onServiceConnected(ComponentName name, IBinder service) {
+            Log.d(TAG, "onServiceConnected() called");
+            Toast.makeText(DownloadActivity.this, "onServiceConnected() called", Toast.LENGTH_SHORT).show();        
             DownloadBinder binder = (DownloadBinder) service; 
             mService = binder.getService();
             mBound = true;
@@ -89,6 +101,8 @@ public class DownloadActivity extends FragmentActivity {
         
         @Override
         public void onServiceDisconnected(ComponentName name) {
+            Log.d(TAG, "onServiceDisconnected() called");
+            Toast.makeText(DownloadActivity.this, "onServiceDisconnected() called", Toast.LENGTH_SHORT).show();        
             mBound = false;
         }
     };
@@ -101,9 +115,8 @@ public class DownloadActivity extends FragmentActivity {
                 
                 switch (type) {
                     case MyIntents.Types.PROCESS:
-                        int progress = intent.getIntExtra(MyIntents.PROCESS_PROGRESS, 0);
-                        mLoadingProgressBar.setProgress(progress);
-//                        Log.d(TAG, "progress " + progress);
+                        long progress = intent.getLongExtra(MyIntents.PROCESS_PROGRESS, 3);
+                        mLoadingProgressBar.setProgress((int)progress);
                         mLoadingProgressTv.setText("" + progress + "%");
                         break;
                     default:
